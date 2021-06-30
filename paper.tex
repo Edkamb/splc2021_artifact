@@ -1,0 +1,240 @@
+\documentclass[runningheads]{llncs}        
+\input{preamble}
+
+
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\usepackage[T1]{fontenc}
+\title{Variability Modules for Java-like Languages}
+\subtitle{Artifact Submission}
+ \author{%
+   Ferruccio Damiani\inst{1}
+   \and Reiner H\"ahnle\inst{2}
+  \and Eduard Kamburjan\inst{3}
+  \and\\ Michael Lienhardt\inst{4}
+ \and Luca Paolini\inst{1}
+ \institute{
+ University of Torino, Torino, Italy\\
+ \texttt{$\{$ferruccio.damiani, luca.paolini$\}$@unito.it}
+ \and
+ Technische Universit{\"a}t Darmstadt, Darmstadt, Germany\\
+ \texttt{haehnle@cs.tu-darmstadt.de}
+ \and
+ University of Oslo, Oslo, Norway\\
+ \texttt{eduard@ifi.uio.no}
+ \and
+ ONERA, Palaiseau, France\\
+ \texttt{michael.lienhardt@onera.fr}
+   }
+ }
+
+\begin{document}
+\maketitle
+\section{Variability Modules}
+\begin{quote}
+This artifact accompanies an \texttt{SPLC} article~\cite{new}, which will be available under \url{https://doi.org/10.1145/3461001.3471143}. For full details, we refer to that article, the following is a summary of its main findings.
+\end{quote}
+
+
+
+A Software Product Line (SPL) is a family of similar programs
+(called variants) generated from a common artifact base.  A Multi
+SPL (MPL) is a set of interdependent SPLs (i.e., such that an SPL's
+variant can depend on variants from other SPLs).  MPLs are
+challenging to model and implement efficiently, especially when
+different variants of the same SPL must coexist and interoperate.
+We address this challenge by introducing \emph{variability modules} (VMs),
+a new language construct. A VM represents both a module and an SPL
+of standard modules (variability-free), possibly interdependent.
+Generating a variant of a VM triggers the generation of all variants
+required to fulfill its dependencies.  Then, a set of interdependent
+VMs  implements %represents
+an MPL that can be compiled into a set of standard modules.
+We illustrate VMs by an example from an industrial modeling
+scenario, formalize them in a core calculus,  
+This document describes the provided
+implementation of VMs for the
+Java-like modeling language ABS, as well as the case studies used for evaluation in the conference paper.
+
+
+
+Variability modules are based on the standard concept of a module, used to
+structure large software systems since the 1970s, as a
+baseline. Software modules are supported in many programming and
+modeling languages, including ABS, Ada, Haskell, Java, Scala, to name
+just a few. Because modules are intended to facilitate interoperability
+and encapsulation, no further \emph{ad hoc} concepts are needed for
+this purpose. We merely \emph{add variability} to modules,
+rendering
+each module
+a product line of standard, variability-free modules.
+
+The main advantage of VMs is their conceptual simplicity: as a
+straightforward extension of standard software modules, they are
+intuitive to use for anyone familiar with modules and with
+software product lines. Each VM is both, a module and a product line of
+modules.  This reduction of concepts not only drastically simplifies
+syntax, but reduces the cognitive burden on the modeler.  We
+substantiate this claim with several case studies that compare VMs with alternative modeling approaches.
+
+
+By using modules, we can deal with interoperable variants, i.e., the situation where 
+different product variants from the same product line need to co-exist
+in the same context and must be interoperable~\cite{DamianiHKL18b}.
+
+For example, using an industrial case study from the
+literature~\cite{KHS18}, %we
+performed for Deutsche Bahn Netz AG, consider the case of railway infrastructure, where:
+\begin{enumerate}
+\item Several interdependent product lines for networks, signals,
+switches, etc., occur.
+\item Mechanic and electric rail switches (and other components) are different
+variants of the same product line.  Some train stations include
+both variants at the same time and these must be interoperable.
+\end{enumerate}
+
+VMs handle different variants of the same product line by encapsulating each in its own module and carefully managing the links between them.
+
+We formulate the VM concept as an extension of the standard concept of
+a module for Java-like (i.e.,\ object-oriented, class-based and strongly
+typed) languages.  To support variability, VMs employ
+\emph{delta-oriented programming}
+(DOP) \cite{DOP}.
+Specifically, our framework encompasses:
+% 
+\begin{enumerate}
+\item A theoretical foundation of VMs, including formal syntax and
+semantics, in terms of a core calculus.
+\item An implementation of VMs as an extension of the ABS
+language tool chain~\cite{Haehnle13,abs}.
+\end{enumerate}
+      
+We choose ABS, because it features native implementations of DOP and it
+was successfully used in industrial case studies for variability
+modeling~\cite{KHS18,MSAA17,WongDS11}.  We stress that VMs can be
+added on top of \emph{any} Java-like language. 
+
+The provided case studies show that if variants need to co-exist, then VMs can reduce code size (and code duplication) when compared to an approach with monolithic product lines.
+A comparison of two weak memory model models in ABS (Section~8.2.3 in~\cite{new}) uses 272\% more code without VMs, as modules have to be duplicated.
+Similarly, a remodeling of railway infrastructure with VMs uses $\sim$25\% less code than the previous version based on traits (Section 8.2.2~in~\cite{new}).
+The final case study (Section~8.2.1 in~\cite{new}) compares a VM model with a system that used an external tool chain to mimic VMs. 
+
+\section{Context}
+
+\paragraph{Relation to ABS and Code Availability.}
+The artifact is a version of the ABS compiler, extended with the variability module system described above, as well as several examples to reproduce the case studies in Section 8 of the main article. The extension is available online under the following URL (note that the code is in the \texttt{variable\_mod} branch, not the master branch).
+\begin{quote}
+\url{https://github.com/Edkamb/abstools/tree/variable_mod}
+\end{quote}
+
+Variability modules will soon be merged into the main branch of the ABS compiler once an ongoing refactoring phase in the main branch will be completed.
+The documentation of the pull request is located at
+\begin{quote}
+\url{https://github.com/abstools/abstools/pull/279}
+\end{quote}
+
+ABS Language documentation can be found at \url{https://abs-models.org/manual/}, the ticketing system to report problems at \url{https://github.com/abstools/abstools/issues}. 
+
+\paragraph{Changed Code.}
+
+In our VM implementation we tried to reuse as much code as possible from the existing variability system (based on deltas and traits) of ABS. 
+There are no changes to the code implementing delta application. The changes to the frontend are made to the grammar\footnote{\texttt{src/main/java/org/abs\_models/xtext/Abs.xtext}}
+and the AST description language\footnote{\texttt{frontend/src/main/java/org/abs\_models/frontend/ast/*}}. The unfolding mechanism itself is implemented in the \texttt{ProductFlattener} aspect \footnote{\texttt{frontend/src/main/java/org/abs\_models/frontend/delta/ProductFlattener.jadd}} and in related aspects\footnote{\texttt{frontend/src/main/java/org/abs\_models/frontend/delta/*}} (error reporting and adaptation of the type system to accommodate the new constructs).
+Finally, the integration into the workflow is implemented as part of the main method in \texttt{frontend/src/main/java/org/abs\_models/frontend/parser/Main.java}.
+Tests are supplied at \texttt{frontend/src/test/java/org/abs\_models/frontend/delta/localpls/LocalPLsTest.java}.
+
+\section{Instructions}
+
+First, VirtualBox 6.1 has to be installed in your system. It can be downloaded from:
+\begin{quote}
+  \url{https://www.virtualbox.org/wiki/Downloads}
+\end{quote}
+
+
+A virtual machine with the extended ABS compiler preinstalled is available under 
+\begin{quote}
+\url{https://zenodo.org/record/5042218}
+\end{quote}
+
+
+The password for the virtual machine is \texttt{variable}, the user is \texttt{abs}. There is no special requirement on the settings of the VM, it was tested with virtualbox and default settings.
+
+The virtual machine can be loaded in VirtualBox by clicking in the file ``VarModVM.ova'' dowloaded  from the above zenodo repos.
+This file and the preprint of the SPLC companion paper in PDF can be fund in the desktop of the virtual machine.
+They can be read in the VM by left-clicking on them and selecting in the contextual-menu ``Open with other applications'' and  by selecting Firefox Web Browser. 
+
+To run commands, right-click on the opened directory and select \texttt{Open Terminal Here}.
+In the terminal you can run the code, open the \texttt{compiler/abstools} directory in the desktop of the VM and run the commands described in Section~\ref{sec:examples}.
+The generation processes produce a number of warnings, which can all be safely ignored.
+
+
+\subsection{Examples}\label{sec:examples}
+
+
+The conference paper \cite{new} describes several case studies that compare variability modules with other ways to model similar situations.
+These can be reproduced with the help of the following commands:
+
+\begin{itemize}
+\item To compile the running example (Section 2), run
+
+{\tt\small  java -jar frontend/build/libs/absfrontend.jar -{}-prettyprint examples/VM/Rails.abs}
+
+
+\item To compile the AISCO portal (Section 8.2.1, comparing with an external tool chain), run
+
+{\tt\small  java -jar frontend/build/libs/absfrontend.jar -{}-prettyprint examples/VM/Total.abs}
+
+
+
+
+\item To compile the FormbaR model refactoring (Section 8.2.2, comparing with traits), run
+
+{\tt\small  java -jar frontend/build/libs/absfrontend.jar -{}-prettyprint examples/VM/formbar/POSTVM/*abs}
+
+The pre-refactoring model is in \texttt{examples/VM/formbar/PREVM}
+
+
+\item To compile the Memory model (Section 8.2.3, comparing with global product lines), run
+
+{\tt\small  java -jar frontend/build/libs/absfrontend.jar -{}-prettyprint examples/Memory/Mem\_VM.abs}
+
+
+The model without VMs is in \texttt{examples/Memory/VM/Mem\_no\_VM.abs}
+\end{itemize}
+
+\subsection{Compilation}\label{sec:compile}
+To recompile run 
+\begin{verbatim}
+  make
+\end{verbatim}
+from the root directory of the compiler (with \texttt{MAKEFILE} in it).
+The build process produces several warnings. These also indicate no errors and can be ignored.
+The resulting \texttt{.jar} file is generated in \texttt{compiler/abstools/frontend/build/libs/}. 
+Observe that the name of the generated \texttt{.jar} file includes a suffix depending on the current version, for example, 
+\begin{verbatim}
+  absfrontend-variable_mod-old-parser-sunset-1767-g61560577f.jar
+\end{verbatim}
+To clone the whole repository, run 
+\begin{verbatim}
+  git clone https://github.com/Edkamb/abstools.git .
+  git checkout variable_mod
+\end{verbatim}
+
+
+\subsection{Setting up the VM}
+To set up the VM, generate a new virtual machine running a fresh install of Xubuntu 21.04 and run the following to install the dependencies.
+\begin{verbatim}
+  sudo apt install git openjdk-8-jdk erlang make
+\end{verbatim}
+Afterwards, follow the steps in Section~\ref{sec:compile}.
+The provided VM was generated and tested using VirtualBox (\url{https://www.virtualbox.org/wiki/Downloads}) 6.1 with the default settings.
+
+
+\bibliographystyle{abbrv}
+\bibliography{ref}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
