@@ -152,7 +152,7 @@ First, VirtualBox 6.1 has to be installed in your system. It can be downloaded f
 
 A virtual machine with the extended ABS compiler preinstalled is available under 
 \begin{quote}
-\url{https://zenodo.org/record/5042218}
+\url{https://zenodo.org/record/5045008}
 \end{quote}
 
 
@@ -206,9 +206,9 @@ To recompile run
 \begin{verbatim}
   make
 \end{verbatim}
-from the root directory of the compiler (with \texttt{MAKEFILE} in it).
+from the \texttt{compiler/abstools} directory (with \texttt{MAKEFILE} in it).
 The build process produces several warnings. These also indicate no errors and can be ignored.
-The resulting \texttt{.jar} file is generated in \texttt{compiler/abstools/frontend/build/libs/}. 
+The resulting \texttt{.jar} file is generated in \texttt{frontend/build/libs/}. 
 Observe that the name of the generated \texttt{.jar} file includes a suffix depending on the current version, for example, 
 \begin{verbatim}
   absfrontend-variable_mod-old-parser-sunset-1767-g61560577f.jar
